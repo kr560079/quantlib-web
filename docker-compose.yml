@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://api-gateway:8000
+      - CHOKIDAR_USEPOLLING=true
+      - CHOKIDAR_INTERVAL=300
+    volumes:
+      - ./frontend/src:/app/src
+    depends_on:
+      - api-gateway
+
+  api-gateway:
+    build: ./services/api-gateway
+    ports:
+      - "8000:8000"
+    environment:
+      - EQUITY_SERVICE_URL=http://equity-service:8001
+      - FIXED_INCOME_SERVICE_URL=http://fixed-income-service:8002
+      - RISK_SERVICE_URL=http://risk-service:8003
+      - PORT=8000
+    depends_on:
+      - equity-service
+      - fixed-income-service
+      - risk-service
+
+  equity-service:
+    build: ./services/equity-service
+    ports:
+      - "8001:8001"
+    volumes:
+      - sqlite-data:/data/sqlite
+      - duckdb-data:/data/duckdb
+    environment:
+      - SQLITE_PATH=/data/sqlite/equity.db
+      - DUCKDB_PATH=/data/duckdb/analytics.db
+      - PORT=8001
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  fixed-income-service:
+    build: ./services/fixed-income-service
+    ports:
+      - "8002:8002"
+    volumes:
+      - fi-sqlite-data:/data/sqlite
+    environment:
+      - SQLITE_PATH=/data/sqlite/fi.db
+      - PORT=8002
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  risk-service:
+    build: ./services/risk-service
+    ports:
+      - "8003:8003"
+    environment:
+      - PORT=8003
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  sqlite-data:
+  duckdb-data:
+  fi-sqlite-data:

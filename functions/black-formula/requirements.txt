@@ -1,0 +1,2 @@
+functions-framework==3.5.0
+scipy==1.13.0
