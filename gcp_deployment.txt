@@ -1,0 +1,26 @@
+git rev-parse --short HEAD
+7041d1b
+gcr.io/quantlib-web
+
+docker build -t gcr.io/quantlib-web/ql-equity-service:7041d1b        ./services/equity-service
+docker build -t gcr.io/quantlib-web/ql-fixed-income-service:7041d1b  ./services/fixed-income-service
+docker build -t gcr.io/quantlib-web/ql-risk-service:7041d1b          ./services/risk-service
+docker build -t gcr.io/quantlib-web/ql-api-gateway:7041d1b           ./services/api-gateway
+docker build -t gcr.io/quantlib-web/ql-frontend:7041d1b              ./frontend
+
+
+docker push gcr.io/quantlib-web/ql-equity-service:7041d1b
+docker push gcr.io/quantlib-web/ql-fixed-income-service:7041d1b
+docker push gcr.io/quantlib-web/ql-risk-service:7041d1b
+docker push gcr.io/quantlib-web/ql-api-gateway:7041d1b
+docker push gcr.io/quantlib-web/ql-frontend:7041d1b
+
+c:\users\ram\software\terraform.exe init
+c:\users\ram\software\terraform.exe apply   -var="project_id=gcr.io/quantlib-web"   -var="region=us-central1"   -var="image_tag=7041d1b"
+
+black_formula_url = "https://ql-black-formula-5jpqwtc4na-uc.a.run.app"
+equity_service_url = "https://ql-equity-service-5jpqwtc4na-uc.a.run.app"
+frontend_url = "https://ql-frontend-5jpqwtc4na-uc.a.run.app"
+gateway_url = "https://ql-api-gateway-5jpqwtc4na-uc.a.run.app"
+
+

@@ -21,6 +21,11 @@ RUN npm run build
 
 FROM nginx:alpine AS prod
 COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY nginx.conf.template /etc/nginx/conf.d/nginx.conf.template
+
+# Fallback so the image works without an explicit GATEWAY_URL (e.g. local docker run).
+ENV GATEWAY_URL=http://localhost:8000
+
 EXPOSE 8080
-CMD ["nginx", "-g", "daemon off;"]
+# envsubst replaces only ${GATEWAY_URL}, leaving nginx variables ($http_host etc.) intact.
+CMD ["/bin/sh", "-c", "envsubst '${GATEWAY_URL}' < /etc/nginx/conf.d/nginx.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]

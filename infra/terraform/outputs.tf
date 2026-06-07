@@ -9,8 +9,18 @@ output "gateway_url" {
 }
 
 output "equity_service_url" {
-  description = "Internal URL of the equity service"
+  description = "URL of the equity service"
   value       = google_cloud_run_v2_service.equity.uri
+}
+
+output "fixed_income_service_url" {
+  description = "URL of the fixed income service"
+  value       = google_cloud_run_v2_service.fixed_income.uri
+}
+
+output "risk_service_url" {
+  description = "URL of the risk service"
+  value       = google_cloud_run_v2_service.risk.uri
 }
 
 output "black_formula_url" {
